@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qualifire-proxy-caddy-service
+spec:
+  selector:
+    app: qualifire-proxy-caddy
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 443
+      name: https
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: http
+  type: NodePort

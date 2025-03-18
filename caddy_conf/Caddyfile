@@ -1,0 +1,9 @@
+{$REVERSE_PROXY_HOSTNAME} {
+	tls internal
+
+	rewrite * {path}
+
+	reverse_proxy https://{$TARGET_HOSTNAME} {
+		header_up Host {$TARGET_HOSTNAME}
+	}
+}
