@@ -30,6 +30,9 @@ jobs:
         run: |
           helm template mychart qfrp-chart --debug
       
+      - name: Install Kind (Kubernetes in Docker)
+        uses: helm/kind-action@v1.8.0
+
       - name: Run Helm Dry-Run Install
         run: |
           helm install test-release qfrp-chart --dry-run --debug
