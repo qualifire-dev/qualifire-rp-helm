@@ -2,7 +2,7 @@ replicaCount: 1
 
 app:
   image:
-    repository: qualifire-rp
+    repository: caddy
     tag: latest
     pullPolicy: Never
   resources:
@@ -20,7 +20,7 @@ app:
 
 proxy:
   image:
-    repository: qualifire-rp
+    repository: caddy
     tag: latest
     pullPolicy: IfNotPresent
   resources:

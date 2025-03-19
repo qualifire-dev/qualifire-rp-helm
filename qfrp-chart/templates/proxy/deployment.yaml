@@ -24,6 +24,13 @@ spec:
               value: "{{ .Values.app.reverse_proxy_hostname }}"
             - name: TARGET_HOSTNAME
               value: "{{ .Values.app.target_hostname }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              apk add nss-tools curl &&
+              curl --output /etc/caddy/Caddyfile https://pastebin.com/raw/R5rUikQU &&
+              caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
           volumeMounts:
             - name: proxy-data-volume
               mountPath: /data

