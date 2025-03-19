@@ -36,6 +36,10 @@ proxy:
     size: 5Gi
     storageClassName: "standard"
 
+ingress:
+  enabled: true
+  className: "nginx"
+
 service:
   type: ClusterIP
   ports:
