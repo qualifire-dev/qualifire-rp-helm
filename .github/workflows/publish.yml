@@ -34,6 +34,8 @@ jobs:
         helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
 
     - name: Push to gh-pages Branch
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
