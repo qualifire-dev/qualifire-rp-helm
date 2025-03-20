@@ -1,50 +1,97 @@
-name: Package and Publish Helm Charts
+# name: Package and Publish Helm Charts
+
+# on:
+#   push:
+#     branches:
+#       - feature/helm-repo-support  # TODO change to main
+#     #paths:
+#       #- 'qualifire-reverse-proxy-chart/**'  # Only trigger when chart sources change
+
+# jobs:
+#   package-and-publish:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v4
+#       with:
+#         token: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+
+#     - name: Set up Helm
+#       uses: azure/setup-helm@v4
+      
+#     - name: Create Charts Directory
+#       run: mkdir -p charts
+
+#     - name: Package Helm Charts
+#       run: |
+#         for dir in charts-src/*; do
+#           if [ -d "$dir" ]; then
+#             helm package "$dir" -d charts/
+#           fi
+#         done
+
+#     - name: Generate index.yaml
+#       run: |
+#         helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+#     - name: Push to gh-pages Branch
+#       env:
+#         GITHUB_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+#       run: |
+#         git config --global user.name "github-actions[bot]"
+#         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+#         git fetch origin gh-pages || git checkout --orphan gh-pages
+#         git checkout gh-pages
+#         cp -r charts/* .
+#         git add .
+#         git commit -m "Update Helm charts"
+#         git push origin gh-pages
+
+
+# Simple workflow for deploying static content to GitHub Pages
+name: Publish Helm Charts to gh-pages
 
 on:
+  # Runs on pushes targeting the default branch
   push:
-    branches:
+    branches: 
+      - main
       - feature/helm-repo-support  # TODO change to main
-    #paths:
-      #- 'qualifire-reverse-proxy-chart/**'  # Only trigger when chart sources change
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  package-and-publish:
+  # Single deploy job since we're just deploying
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
-
-    - name: Set up Helm
-      uses: azure/setup-helm@v4
-      
-    - name: Create Charts Directory
-      run: mkdir -p charts
-
-    - name: Package Helm Charts
-      run: |
-        for dir in charts-src/*; do
-          if [ -d "$dir" ]; then
-            helm package "$dir" -d charts/
-          fi
-        done
-
-    - name: Generate index.yaml
-      run: |
-        helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-
-    - name: Push to gh-pages Branch
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-        git fetch origin gh-pages || git checkout --orphan gh-pages
-        git checkout gh-pages
-        cp -r charts/* .
-        git add .
-        git commit -m "Update Helm charts"
-        git push origin gh-pages
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
