@@ -24,16 +24,16 @@ jobs:
 
       - name: Run Helm Lint
         run: |
-          helm lint qualifire-reverse-proxy-chart
+          helm lint charts-src/qualifire-reverse-proxy-chart
       
       - name: Verify Helm Templates
         run: |
-          helm template mychart qualifire-reverse-proxy-chart --debug
+          helm template mychart charts-src/qualifire-reverse-proxy-chart --debug
       
       - name: Install Kind (Kubernetes in Docker)
         uses: helm/kind-action@v1.8.0
 
       - name: Run Helm Dry-Run Install
         run: |
-          helm install test-release qualifire-reverse-proxy-chart --dry-run --debug
+          helm install test-release charts-src/qualifire-reverse-proxy-chart --dry-run --debug
   
