@@ -7,24 +7,39 @@ This Helm chart deploys two Caddy-based reverse proxy services:
 - `app-rp-service`: Routes traffic for `app.qualifire.ai`
 - `proxy-rp-service`: Routes traffic for `proxy.qualifire.ai`
 
+
 ## Installation
 ```sh
-helm install qualifire-reverse-proxy-chart ./qualifire-reverse-proxy-chart --values ./qualifire-reverse-proxy-chart/values.yaml
+# Adding the helm repo
+helm repo add qualifire https://qualifire-dev.github.io/qualifire-rp-helm/
+helm repo update
+
+# Installing
+helm install qualifire-reverse-proxy qualifire/qualifire-reverse-proxy-chart
+
+# Installing with values overridden
+helm install qualifire-reverse-proxy qualifire/qualifire-reverse-proxy-chart \
+    --set proxy.reverse_proxy_hostname=qualifire-proxy.mycompany.com \
+    --set app.reverse_proxy_hostname=qualifire-app.mycompany.com
+
+# or, using a values file
+helm install qualifire-reverse-proxy qualifire/qualifire-reverse-proxy-chart \
+    -f my-values.yaml
 ```
 
 ## Upgrade
 ```sh
-helm upgrade qualifire-reverse-proxy-chart ./qualifire-reverse-proxy-chart --values ./qualifire-reverse-proxy-chart/values.yaml
+helm upgrade qualifire-reverse-proxy qualifire/qualifire-reverse-proxy-chart
 ```
 
 ## Uninstallation
 ```sh
-helm uninstall qualifire-reverse-proxy-chart
+helm uninstall qualifire-reverse-proxy
 ```
 
 ## Configuration (Values.yaml)
 
-The values.yaml are pretty straight forward. \
+The [values.yaml](https://github.com/qualifire-dev/qualifire-rp-helm/blob/main/charts/qualifire-reverse-proxy-chart/values.yaml) is pretty straight forward. \
 However, there are still a few configuration keys that you should take a look at:
 
 | Key | Description |
@@ -32,7 +47,7 @@ However, there are still a few configuration keys that you should take a look at
 | `proxy.reverse_proxy_hostname` | Client-facing hostname for the proxy service (e.g., `qualifire-proxy.mycompany.com`). |
 | `app.reverse_proxy_hostname` | Client-facing hostname for the app service (e.g., `qualifire-app.mycompany.com`). |
 
-Modify `values.yaml` to customize these (and more) values before deployment.
+Create your own `values.yaml` with your needed configuration, and install using the `-f my-values.yaml`
 
 
 ## HTTPS support
