@@ -4,7 +4,7 @@ app:
   image:
     repository: caddy
     tag: latest
-    pullPolicy: Never
+    pullPolicy: IfNotPresent
   resources:
     limits:
       cpu: "2"
