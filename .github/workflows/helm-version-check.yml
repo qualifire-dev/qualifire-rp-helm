@@ -1,0 +1,86 @@
+name: Helm Chart Version Check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'charts/**'  # Only run when files in the charts directory are modified
+
+jobs:
+  check-chart-versions:
+    name: Check Helm Chart Versions
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history to properly check changed files
+      
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+      
+      - name: Get Changed Chart Directories
+        id: changed-charts
+        run: |
+          # Find all changed files in the charts directory
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '^charts/')
+          
+          # Extract unique chart directories (assuming charts/chart-name structure)
+          CHART_DIRS=$(echo "$CHANGED_FILES" | grep -o 'charts/[^/]*' | sort -u)
+          
+          if [ -z "$CHART_DIRS" ]; then
+            echo "No chart directories changed. This shouldn't happen due to path filtering."
+            exit 0
+          fi
+          
+          # Set output for next steps
+          echo "directories=$(echo $CHART_DIRS | tr ' ' ',')" >> $GITHUB_OUTPUT
+          echo "Found changed chart directories: $CHART_DIRS"
+      
+      - name: Check Chart Versions
+        env:
+          GH_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+        run: |
+          # Function to check if a chart version already exists in releases
+          check_chart_version() {
+            local chart_dir=$1
+            local chart_name=$(yq eval '.name' "$chart_dir/Chart.yaml")
+            local chart_version=$(yq eval '.version' "$chart_dir/Chart.yaml")
+            
+            echo "Checking chart: $chart_name, version: $chart_version"
+
+            # Check if this version already exists in GitHub releases
+            release_exists=$(gh release view "$chart_name-$chart_version" 2>/dev/null || echo "not_found")
+
+            if [[ "$release_exists" != "not_found" ]]; then
+              echo "::error::Chart $chart_name version $chart_version already exists in releases. Please bump the version in $chart_dir/Chart.yaml"
+              return 1
+            else
+              echo "Chart $chart_name version $chart_version is new. Validation passed."
+              return 0  
+            fi
+          }
+          
+          # Install yq for YAML parsing
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          
+          # Check each changed chart
+          IFS=',' read -ra CHART_DIRS <<< "${{ steps.changed-charts.outputs.directories }}"
+          exit_code=0
+          
+          for chart_dir in "${CHART_DIRS[@]}"; do
+            if [ -f "$chart_dir/Chart.yaml" ]; then
+              if ! check_chart_version "$chart_dir"; then
+                exit_code=1
+              fi
+            else
+              echo "Warning: $chart_dir doesn't contain Chart.yaml"
+            fi
+          done
+          
+          exit $exit_code

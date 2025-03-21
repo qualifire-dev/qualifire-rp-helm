@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-qualifire-proxy-rp
+  labels:
+    app: {{ .Release.Name }}-qualifire-proxy-rp
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-qualifire-proxy-rp
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-qualifire-proxy-rp
+    spec:
+      containers:
+        - name: qualifire-proxy-rp
+          image: "{{ .Values.proxy.image.repository }}:{{ .Values.proxy.image.tag }}"
+          imagePullPolicy: {{ .Values.proxy.image.pullPolicy }}
+          resources: {{ toYaml .Values.proxy.resources | nindent 12 }}
+          env:
+            - name: REVERSE_PROXY_HOSTNAME
+              value: "{{ .Values.app.reverse_proxy_hostname }}"
+            - name: TARGET_HOSTNAME
+              value: "{{ .Values.app.target_hostname }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              apk add nss-tools curl &&
+              curl --output /etc/caddy/Caddyfile https://raw.githubusercontent.com/qualifire-dev/qualifire-rp-helm/refs/heads/main/caddy_conf/Caddyfile &&
+              caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+          volumeMounts:
+            - name: proxy-data-volume
+              mountPath: /data
+          livenessProbe:
+            tcpSocket:
+              port: 443
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command: 
+                - sh
+                - -c
+                - curl -k --resolve $REVERSE_PROXY_HOSTNAME:443:127.0.0.1 https://$REVERSE_PROXY_HOSTNAME
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+      volumes:
+        - name: proxy-data-volume
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-qualifire-proxy-rp-data

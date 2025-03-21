@@ -1,0 +1,31 @@
+name: Helm Chart Package & Push to gh-pages
+
+on:
+  push:
+    branches:
+      - main  # TODO change to main
+    paths:
+      - 'charts/**'  # Only trigger when chart sources change
+
+jobs:
+  package-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+        fetch-depth: 0
+
+    - name: Configure Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.7.0
+      with:
+        packages_with_index: true
+      env:
+        CR_TOKEN: "${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}"
