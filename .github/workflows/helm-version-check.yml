@@ -42,6 +42,8 @@ jobs:
           echo "Found changed chart directories: $CHART_DIRS"
       
       - name: Check Chart Versions
+        env:
+          GH_TOKEN: ${{ secrets.GITHPAT_QUALIFIRE_RP_HELM_GH_PAGESUB_TOKEN }}
         run: |
           # Function to check if a chart version already exists in releases
           check_chart_version() {
@@ -89,5 +91,4 @@ jobs:
           done
           
           exit $exit_code
-        env:
-          GH_TOKEN: ${{ secrets.GITHPAT_QUALIFIRE_RP_HELM_GH_PAGESUB_TOKEN }}
+
