@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - feature/helm-repo-support  # TODO change to main
-    #paths:
-      #- 'qualifire-reverse-proxy-chart/**'  # Only trigger when chart sources change
+    # paths:
+    #   - 'qualifire-reverse-proxy-chart/**'  # Only trigger when chart sources change
 
 jobs:
   package-and-push:
@@ -16,35 +16,48 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+        fetch-depth: 0
 
-    - name: Set up Helm
-      uses: azure/setup-helm@v4
-      
-    - name: Create Charts Directory
-      run: mkdir -p charts
-
-    - name: Package Helm Charts
+    - name: Configure Git
       run: |
-        for dir in charts-src/*; do
-          if [ -d "$dir" ]; then
-            helm package "$dir" -d charts/
-          fi
-        done
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Generate index.yaml
-      run: |
-        helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
-
-    - name: Push to gh-pages Branch
+    - name: Run chart-releaser
+      uses: helm/chart-releaser-action@v1.7.0
+      with:
+        charts_dir: charts-src
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        CR_TOKEN: "${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}"
 
-        git fetch origin gh-pages || git checkout --orphan gh-pages
-        git checkout gh-pages
-        cp -r charts/* .
-        git add .
-        git commit -m "Update Helm charts"
-        git push origin gh-pages
+    # - name: Set up Helm
+    #   uses: azure/setup-helm@v4
+      
+    # - name: Create Charts Directory
+    #   run: mkdir -p charts
+
+    # - name: Package Helm Charts
+    #   run: |
+    #     for dir in charts-src/*; do
+    #       if [ -d "$dir" ]; then
+    #         helm package "$dir" -d charts/
+    #       fi
+    #     done
+
+    # - name: Generate index.yaml
+    #   run: |
+    #     helm repo index charts --url https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/
+
+    # - name: Push to gh-pages Branch
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
+    #   run: |
+    #     git config --global user.name "github-actions[bot]"
+    #     git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+    #     git fetch origin gh-pages || git checkout --orphan gh-pages
+    #     git checkout gh-pages
+    #     cp -r charts/* .
+    #     git add .
+    #     git commit -m "Update Helm charts"
+    #     git push origin gh-pages

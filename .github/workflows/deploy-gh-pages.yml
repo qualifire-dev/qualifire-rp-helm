@@ -3,13 +3,14 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
-      - feature/helm-repo-support  # This will trigger when you push to the gh-pages branch
-      # TODO: change to gh-pages
+      - gh-pages  # This will trigger when you push to the gh-pages branch
+    
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       pages: write
