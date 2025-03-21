@@ -74,7 +74,7 @@ jobs:
           sudo chmod +x /usr/local/bin/yq
           
           # Set GitHub token for API access
-          echo "GITHUB_TOKEN=${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}" >> $GITHUB_ENV
+          echo "GH_TOKEN="$GH_TOKEN" >> $GITHUB_ENV
           
           # Check each changed chart
           IFS=',' read -ra CHART_DIRS <<< "${{ steps.changed-charts.outputs.directories }}"
@@ -91,4 +91,3 @@ jobs:
           done
           
           exit $exit_code
-
