@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  qualifire-reverse-proxy-chart:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-03-21T11:40:57.437873036Z"
+    description: A Helm chart for qualifire reverse-proxy
+    digest: 064032af12191f38b569c78c27515c98ae05c3e024be4a47c40cce4438b06f5a
+    name: qualifire-reverse-proxy-chart
+    type: application
+    urls:
+    - qualifire-reverse-proxy-chart-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-03-21T11:40:57.437877814Z"
