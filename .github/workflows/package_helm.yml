@@ -1,4 +1,4 @@
-name: Package and Publish Helm Charts
+name: Package Helm Charts and Push to gh-pages
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       #- 'qualifire-reverse-proxy-chart/**'  # Only trigger when chart sources change
 
 jobs:
-  package-and-publish:
+  package-and-push:
     runs-on: ubuntu-latest
 
     steps:
