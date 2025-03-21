@@ -3,6 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches:
+      # TODO: change to gh-pages
       - feature/helm-repo-support  # This will trigger when you push to the gh-pages branch
     
   workflow_dispatch: 
