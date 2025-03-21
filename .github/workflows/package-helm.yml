@@ -3,9 +3,11 @@ name: Helm Chart Package & Push to gh-pages
 on:
   push:
     branches:
-      - main  # TODO change to main
+      - main
     paths:
       - 'charts/**'  # Only trigger when chart sources change
+  
+  workflow_dispatch:  # Allows manual triggering for testing
 
 jobs:
   package-and-push:
