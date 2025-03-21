@@ -61,7 +61,7 @@ jobs:
               return 1
             else
               echo "Chart $chart_name version $chart_version is new. Validation passed."
-              return 0
+              return 0  
             fi
           }
           
