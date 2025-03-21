@@ -51,9 +51,13 @@ jobs:
             
             echo "Checking chart: $chart_name, version: $chart_version"
             
+            echo $(gh release view "$chart_name-$chart_version)
+
             # Check if this version already exists in GitHub releases
             release_exists=$(gh release view "$chart_name-$chart_version" 2>/dev/null || echo "not_found")
             
+            echo $release_exists
+
             if [[ "$release_exists" != "not_found" ]]; then
               echo "::error::Chart $chart_name version $chart_version already exists in releases. Please bump the version in $chart_dir/Chart.yaml"
               return 1
