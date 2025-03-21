@@ -43,7 +43,7 @@ jobs:
       
       - name: Check Chart Versions
         env:
-          GH_TOKEN: ${{ secrets.GITHPAT_QUALIFIRE_RP_HELM_GH_PAGESUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_QUALIFIRE_RP_HELM_GH_PAGES }}
         run: |
           # Function to check if a chart version already exists in releases
           check_chart_version() {
@@ -72,9 +72,6 @@ jobs:
           # Install yq for YAML parsing
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
-          
-          # Set GitHub token for API access
-          # echo "GH_TOKEN=$GH_TOKEN" >> $GITHUB_ENV
           
           # Check each changed chart
           IFS=',' read -ra CHART_DIRS <<< "${{ steps.changed-charts.outputs.directories }}"

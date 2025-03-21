@@ -1,4 +1,4 @@
-name: Package Helm Charts and Push to gh-pages
+name: Helm Chart Package & Push to gh-pages
 
 on:
   push:
