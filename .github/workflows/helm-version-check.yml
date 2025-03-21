@@ -51,7 +51,7 @@ jobs:
             
             echo "Checking chart: $chart_name, version: $chart_version"
             
-            echo $(gh release view "$chart_name-$chart_version)
+            echo $(gh release view "$chart_name-$chart_version")
 
             # Check if this version already exists in GitHub releases
             release_exists=$(gh release view "$chart_name-$chart_version" 2>/dev/null || echo "not_found")
