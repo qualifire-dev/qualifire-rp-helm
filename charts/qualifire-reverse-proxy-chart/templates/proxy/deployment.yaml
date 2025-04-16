@@ -21,9 +21,9 @@ spec:
           resources: {{ toYaml .Values.proxy.resources | nindent 12 }}
           env:
             - name: REVERSE_PROXY_HOSTNAME
-              value: "{{ .Values.app.reverse_proxy_hostname }}"
+              value: "{{ .Values.proxy.reverse_proxy_hostname }}"
             - name: TARGET_HOSTNAME
-              value: "{{ .Values.app.target_hostname }}"
+              value: "{{ .Values.proxy.target_hostname }}"
           command: ["/bin/sh"]
           args:
             - -c
